@@ -1,0 +1,46 @@
+name: Deploy Taiwan Nearshore Fish Analyzer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site-source.zip'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prepare static website
+        run: |
+          test -f site-source.zip
+          mkdir site
+          unzip -q site-source.zip -d site
+          test -s site/index.html
+          test -f site/manifest.webmanifest
+          test -f site/sw.js
+          touch site/.nojekyll
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
