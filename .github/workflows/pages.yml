@@ -95,7 +95,7 @@ jobs:
             new MutationObserver(() => addPhotos()).observe(document.documentElement, {childList:true,subtree:true});
           })();
           EOF
-          printf '\\n<script src="./fish-images.js" defer></script>\\n' >> site/index.html
+          printf '\n<script src="./fish-images.js" defer></script>\n' >> site/index.html
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
