@@ -42,7 +42,7 @@ jobs:
           cat > site/fish-images.js <<'EOF'
           (() => {
             const memory = new Map();
-            const STORE = 'nearshore-fish-photo-v3';
+            const STORE = 'nearshore-fish-photo-v4';
             const saved = (() => { try { return JSON.parse(localStorage.getItem(STORE) || '{}'); } catch (_) { return {}; } })();
             const allowed = new Set(['cc0','cc-by','cc-by-sa']);
             const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -57,17 +57,25 @@ jobs:
                   const taxon = (data.results || []).find(x => String(x.name || '').toLowerCase() === name.toLowerCase());
                   if (!taxon) return null;
                   const candidates = [];
-                  if (taxon.default_photo) candidates.push(taxon.default_photo);
-                  const obsResponse = await fetch('https://api.inaturalist.org/v1/observations?taxon_id=' + taxon.id + '&photos=true&per_page=12&order_by=quality_grade');
+                  if (taxon.default_photo) candidates.push({
+                    url: taxon.default_photo.medium_url || taxon.default_photo.url,
+                    attribution: taxon.default_photo.attribution || 'iNaturalist',
+                    license: taxon.default_photo.license_code
+                  });
+                  const obsResponse = await fetch('https://api.inaturalist.org/v1/observations?taxon_id=' + taxon.id + '&photos=true&photo_license=cc0,cc-by,cc-by-sa&per_page=30&order_by=quality_grade');
                   if (obsResponse.ok) {
                     const observations = await obsResponse.json();
                     for (const observation of observations.results || []) {
-                      for (const photo of observation.photos || []) candidates.push({...photo, attribution: photo.attribution || observation.user?.login || 'iNaturalist'});
+                      for (const photo of observation.photos || []) candidates.push({
+                        url: photo.url ? photo.url.replace('square.', 'medium.') : null,
+                        attribution: photo.attribution || observation.user?.login || 'iNaturalist',
+                        license: photo.license_code
+                      });
                     }
                   }
-                  const photo = candidates.find(p => p.medium_url && allowed.has(String(p.license_code || '').toLowerCase()));
+                  const photo = candidates.find(p => p.url && allowed.has(String(p.license || '').toLowerCase()));
                   if (!photo) return null;
-                  const result = {url:photo.medium_url.replace(/^http:/,'https:'), attribution:photo.attribution || 'iNaturalist', license:photo.license_code};
+                  const result = {url:photo.url.replace(/^http:/,'https:'), attribution:photo.attribution, license:photo.license};
                   saved[name] = result;
                   try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch (_) {}
                   return result;
