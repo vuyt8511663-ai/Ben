@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'site-source.zip'
+      - 'deploy-parts/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -26,9 +26,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Prepare static website
+      - name: Rebuild and verify website archive
         run: |
-          test -f site-source.zip
+          test -d deploy-parts
+          cat deploy-parts/part-*.b64 | tr -d '\n' | base64 -d > site-source.zip
+          unzip -tq site-source.zip
           mkdir site
           unzip -q site-source.zip -d site
           test -s site/index.html
