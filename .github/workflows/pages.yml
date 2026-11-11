@@ -41,58 +41,57 @@ jobs:
         run: |
           cat > site/fish-images.js <<'EOF'
           (() => {
-            const cache = new Map();
-            const photoFor = async (scientificName) => {
-              if (cache.has(scientificName)) return cache.get(scientificName);
-              const task = fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(scientificName.replace(/ /g, '_')))
-                .then(r => r.ok ? r.json() : null)
-                .then(data => data && data.thumbnail && data.thumbnail.source ? data.thumbnail.source : null)
+            const photoCache = new Map();
+            async function photoFor(scientificName) {
+              if (photoCache.has(scientificName)) return photoCache.get(scientificName);
+              const request = fetch('https://api.inaturalist.org/v1/taxa?q=' + encodeURIComponent(scientificName) + '&rank=species&per_page=10')
+                .then(response => response.ok ? response.json() : null)
+                .then(data => {
+                  const exact = (data && data.results || []).find(item =>
+                    String(item.name || '').toLowerCase() === scientificName.toLowerCase() &&
+                    item.default_photo && item.default_photo.medium_url
+                  );
+                  return exact ? exact.default_photo.medium_url.replace(/^http:/, 'https:') : null;
+                })
                 .catch(() => null);
-              cache.set(scientificName, task);
-              return task;
-            };
-            const addPhotos = async () => {
-              const nodes = Array.from(document.querySelectorAll('i, em')).filter(el =>
-                /^[A-Z][a-z-]+ [a-z-]+$/.test((el.textContent || '').trim())
-              );
-              for (const nameNode of nodes) {
-                const scientificName = nameNode.textContent.trim();
-                if (nameNode.dataset.speciesPhotoDone) continue;
-                nameNode.dataset.speciesPhotoDone = '1';
+              photoCache.set(scientificName, request);
+              return request;
+            }
+            async function renderPhotos() {
+              const names = document.querySelectorAll('.fishcard .latin');
+              for (const nameNode of names) {
+                const card = nameNode.closest('.fishcard');
+                const visual = card && card.querySelector('.fishvisual');
+                const scientificName = (nameNode.textContent || '').trim();
+                if (!visual || !scientificName || scientificName === '學名未提供' ||
+                    /\\bspp\\./i.test(scientificName) || visual.dataset.photoLookup === 'done') continue;
+                visual.dataset.photoLookup = 'done';
                 const url = await photoFor(scientificName);
-                if (!url) continue;
-                let card = nameNode.closest('[class*="card"], article, li');
-                if (!card) {
-                  card = nameNode.parentElement;
-                  for (let i = 0; i < 5 && card && card.parentElement; i++) {
-                    const rect = card.getBoundingClientRect();
-                    if (rect.width >= 180 && rect.width <= 600 && rect.height >= 180) break;
-                    card = card.parentElement;
-                  }
-                }
-                if (!card || card.querySelector('[data-species-photo]')) continue;
-                const rect = card.getBoundingClientRect();
-                if (rect.width < 180) continue;
-                if (getComputedStyle(card).position === 'static') card.style.position = 'relative';
+                if (!url || !visual.isConnected) continue;
                 const img = document.createElement('img');
                 img.src = url;
-                img.alt = scientificName;
+                img.alt = scientificName + ' 外觀照片';
                 img.loading = 'lazy';
                 img.decoding = 'async';
-                img.dataset.speciesPhoto = '1';
-                Object.assign(img.style, {
-                  position: 'absolute', top: '28px', left: '50%',
-                  transform: 'translateX(-50%)', width: '112px', height: '112px',
-                  objectFit: 'contain', zIndex: '3', pointerEvents: 'none',
-                  filter: 'drop-shadow(0 3px 5px rgba(0,0,0,.18))'
-                });
-                card.appendChild(img);
-                card.style.overflow = 'hidden';
+                img.referrerPolicy = 'no-referrer';
+                img.style.objectFit = 'contain';
+                img.style.padding = '7px';
+                img.onerror = () => {
+                  img.remove();
+                  visual.dataset.photoLookup = 'unavailable';
+                };
+                const badge = visual.querySelector('small');
+                visual.textContent = '';
+                visual.appendChild(img);
+                if (badge) visual.appendChild(badge);
               }
-            };
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addPhotos);
-            else addPhotos();
-            new MutationObserver(() => addPhotos()).observe(document.documentElement, {childList:true,subtree:true});
+            }
+            function start() {
+              renderPhotos();
+              new MutationObserver(() => renderPhotos()).observe(document.getElementById('fishGrid') || document.body, {childList:true,subtree:true});
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once:true});
+            else start();
           })();
           EOF
           printf '\n<script src="./fish-images.js" defer></script>\n' >> site/index.html
