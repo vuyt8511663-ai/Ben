@@ -62,7 +62,7 @@ jobs:
                     attribution: taxon.default_photo.attribution || 'iNaturalist',
                     license: taxon.default_photo.license_code
                   });
-                  const obsResponse = await fetch('https://api.inaturalist.org/v1/observations?taxon_id=' + taxon.id + '&photos=true&photo_license=cc0,cc-by,cc-by-sa&per_page=30&order_by=quality_grade');
+                  const obsResponse = await fetch('https://api.inaturalist.org/v1/observations?taxon_id=' + taxon.id + '&photos=true&photo_license=CC-BY,CC-BY-SA&per_page=30&order_by=quality_grade');
                   if (obsResponse.ok) {
                     const observations = await obsResponse.json();
                     for (const observation of observations.results || []) {
