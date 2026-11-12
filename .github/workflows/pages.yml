@@ -42,7 +42,7 @@ jobs:
           cat > site/fish-images.js <<'EOF'
           (() => {
             const memory = new Map();
-            const STORE = 'nearshore-fish-photo-v4';
+            const STORE = 'nearshore-fish-photo-v5';
             const saved = (() => { try { return JSON.parse(localStorage.getItem(STORE) || '{}'); } catch (_) { return {}; } })();
             const allowed = new Set(['cc0','cc-by','cc-by-sa']);
             const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -94,6 +94,7 @@ jobs:
                   visual.dataset.photoLookup='loading';
                   const photo=await lookup(name);
                   if (!photo || !visual.isConnected) { visual.dataset.photoLookup='none'; return; }
+                  visual.style.position='relative'; visual.style.overflow='hidden';
                   const img=document.createElement('img');
                   img.src=photo.url; img.alt=name+' 魚種照片'; img.loading='lazy'; img.decoding='async'; img.referrerPolicy='no-referrer';
                   Object.assign(img.style,{display:'block',width:'100%',height:'100%',boxSizing:'border-box',objectFit:'contain',padding:'8px 8px 22px',maxWidth:'100%',maxHeight:'100%'});
