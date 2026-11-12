@@ -123,6 +123,28 @@ jobs:
           })();
           EOF
           printf '\n<script src="./fish-images.js" defer></script>\n' >> site/index.html
+          cat > site/add-fish-species.js <<'EOF'
+          (() => {
+            const add = () => {
+              const grid = document.getElementById('fishGrid');
+              if (!grid || grid.querySelector('[data-species-id="mene-maculata"]')) return;
+              const card = document.createElement('article');
+              card.className = 'fishcard';
+              card.dataset.speciesId = 'mene-maculata';
+              card.innerHTML = '<div class="fishvisual"><small>近海洄游魚</small></div><div class="fishinfo"><h3>眼眶魚（皮刀魚）</h3><em class="latin">Mene maculata</em><div class="tags"><span>中層</span><span>側扁形</span><span>物種條目</span></div><p>體高而極側扁，輪廓近三角形，腹緣薄而銳利；體色銀白，背部偏藍並散布藍色小斑。主要棲息於沿岸及河口附近水域。</p></div>';
+              grid.appendChild(card);
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add, {once:true});
+            else add();
+            const observe = () => {
+              const grid = document.getElementById('fishGrid');
+              if (grid) new MutationObserver(add).observe(grid, {childList:true});
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', observe, {once:true});
+            else observe();
+          })();
+          EOF
+          printf '\n<script src="./add-fish-species.js" defer></script>\n' >> site/index.html
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
