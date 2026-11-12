@@ -93,7 +93,15 @@ jobs:
                   if (!visual || !name || name==='學名未提供' || /\\bspp\\./i.test(name) || ['done','loading','none'].includes(visual.dataset.photoLookup)) return;
                   visual.dataset.photoLookup='loading';
                   const photo=await lookup(name);
-                  if (!photo || !visual.isConnected) { visual.dataset.photoLookup='none'; return; }
+                  if (!photo || !visual.isConnected) {
+                    visual.dataset.photoLookup='none';
+                    visual.style.position='relative';
+                    const note=document.createElement('span');
+                    note.textContent='尚無符合授權的物種照片';
+                    Object.assign(note.style,{position:'absolute',left:'7px',bottom:'7px',fontSize:'9px',lineHeight:'16px',padding:'0 6px',borderRadius:'8px',background:'rgba(255,255,255,.82)',color:'#31545a'});
+                    visual.appendChild(note);
+                    return;
+                  }
                   visual.style.position='relative'; visual.style.overflow='hidden';
                   const img=document.createElement('img');
                   img.src=photo.url; img.alt=name+' 魚種照片'; img.loading='lazy'; img.decoding='async'; img.referrerPolicy='no-referrer';
