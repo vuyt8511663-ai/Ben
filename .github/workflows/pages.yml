@@ -131,7 +131,7 @@ jobs:
               const card = document.createElement('article');
               card.className = 'fishcard';
               card.dataset.speciesId = 'mene-maculata';
-              card.innerHTML = '<div class="fishvisual"><small>近海洄游魚</small></div><div class="fishinfo"><h3>皮刀魚（眼眶魚）</h3><em class="latin">Mene maculata</em><div class="tags"><span>中層</span><span>鱗鰭目</span><span>眼眶魚科</span></div><p>體高而極側扁，輪廓近三角形，腹緣薄而銳利；體色銀白，背部偏藍並散布藍色小斑。主要棲息於沿岸及河口附近水域。</p></div>';
+              card.innerHTML = '<div class="fishvisual"><small>近海洄游魚</small></div><div class="fishinfo"><h3>皮刀魚（眼眶魚）</h3><em class="latin">Mene maculata</em><div class="tags"><span>中層</span><span>鱸形目</span><span>眼眶魚科</span></div><p>體高而極側扁，輪廓近三角形，腹緣薄而銳利；體色銀白，背部偏藍並散布藍色小斑。主要棲息於沿岸及河口附近水域。</p></div>';
               grid.appendChild(card);
             };
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add, {once:true});
