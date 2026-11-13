@@ -131,7 +131,7 @@ jobs:
               const card = document.createElement('article');
               card.className = 'fishcard';
               card.dataset.speciesId = 'mene-maculata';
-              card.innerHTML = '<div class="fishvisual"><small>近海洄游魚</small></div><div class="fishinfo"><h3>皮刀魚（眼眶魚）</h3><em class="latin">Mene maculata</em><div class="tags"><span>中層</span><span>鱸形目</span><span>眼眶魚科</span></div><p>體高而極側扁，輪廓近三角形，腹緣薄而銳利；體色銀白，背部偏藍並散布藍色小斑。主要棲息於較深水域，農業部魚類圖鑑記載常見深度約50–200公尺；臺灣魚類資料庫另記錄20–95公尺，可能反映不同資料來源及觀測範圍。偶爾游至沿岸及河口覓食，以動物性浮游生物或底棲生物為食，並有趨光性。分布於印度－西太平洋，臺灣北部、西部、南部及澎湖均有紀錄。最大體長約30公分。</p></div>';
+              card.innerHTML = '<div class="fishvisual"><small>近海洄游魚</small></div><div class="fishinfo"><h3>皮刀魚（眼眶魚）</h3><em class="latin">Mene maculata</em><div class="tags"><span>中層</span><span>鱸形目</span><span>眼眶魚科</span></div><p>體高而極側扁，輪廓近三角形，腹緣薄而銳利；體色銀白，背部偏藍並散布藍色小斑。主要棲息於較深水域，農業部魚類圖鑑記載常見深度約50–200公尺；臺灣魚類資料庫另記錄20–95公尺，可能反映不同資料來源及觀測範圍。偶爾游至沿岸及河口覓食，以動物性浮游生物或底棲生物為食，並有趨光性。分布於印度－西太平洋，臺灣北部、西部、南部及澎湖均有紀錄。最大體長約30公分。</p><p><strong>辨識重點：</strong>體高且側扁、腹緣銳利、銀白色魚身帶藍色背部斑點；口小且可伸縮，尾鰭深叉。</p><p><strong>資料來源：</strong><a href="https://kmweb.moa.gov.tw/theme_data.php?id=447&amp;theme=fisheasy" target="_blank" rel="noopener">農業部眼眶魚圖鑑</a>｜<a href="https://fishdb.sinica.edu.tw/taxon/382151-fishdb" target="_blank" rel="noopener">中央研究院臺灣魚類資料庫</a>｜<a href="https://doi.org/10.3390/fishes10040182" target="_blank" rel="noopener">2025年台灣西南海域食性研究</a></p></div>';
               grid.appendChild(card);
             };
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add, {once:true});
